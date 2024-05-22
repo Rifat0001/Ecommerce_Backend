@@ -11,7 +11,7 @@ const createProduct = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: "Product is created successfully",
+      message: "Product created successfully!",
       data: result,
     });
   } catch (err) {
@@ -28,7 +28,7 @@ const getSingleProduct = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: "Product  is retrieved successfully",
+      message: "Product fetched successfully!",
       data: result,
     });
   } catch (err) {
@@ -51,7 +51,7 @@ const deleteSingleProduct = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: "Product deleted successfully",
+      message: "Product deleted successfully!",
     });
   } catch (err) {
     console.error(err);
@@ -78,7 +78,7 @@ const updateSingleProduct = async (req: Request, res: Response) => {
 
     res.status(200).json({
       success: true,
-      message: "Product updated successfully",
+      message: "Product updated successfully!",
       data: result,
     });
   } catch (err) {
@@ -92,11 +92,15 @@ const searchProducts = async (req: Request, res: Response) => {
   try {
     const searchTerm = req.query.searchTerm as string; // Search term from query string
 
-    const products = await productServices.getProducts(searchTerm); // Call getProducts with optional searchTerm
+    const products = await productServices.getProducts(searchTerm);
+
+    const message = searchTerm
+      ? `Products matching search term '${searchTerm}' fetched successfully!`
+      : "Products fetched successfully!";
 
     res.status(200).json({
       success: true,
-      message: products.length > 0 ? "Products found" : "No products found",
+      message,
       data: products,
     });
   } catch (err) {
