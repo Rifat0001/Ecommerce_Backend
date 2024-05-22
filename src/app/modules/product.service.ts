@@ -1,18 +1,16 @@
-import { Product } from "./product.interface";
-import { ProductModel } from "./product.model";
+import { TProduct } from "./product.interface";
+import { Product } from "./product.model";
 
-const createProductIntoDB = async (product: Product) => {
-  const result = await ProductModel.create(product);
-  return result;
-};
-
-const getAllProductsFromDB = async () => {
-  const result = await ProductModel.find();
+const createProductIntoDB = async (productData: TProduct) => {
+  if (await Product.isUserExists(productData.name)) {
+    throw new Error("Product already Exist");
+  }
+  const result = await Product.create(productData);
   return result;
 };
 
 const deleteProductFromDB = async (_id: string) => {
-  const product = await ProductModel.findByIdAndDelete(_id); // Find and delete
+  const product = await Product.findByIdAndDelete(_id); // Find and delete
 
   if (!product) {
     throw new Error("Product not found");
@@ -21,13 +19,13 @@ const deleteProductFromDB = async (_id: string) => {
 };
 
 const getSingleProductFromDB = async (_id: string) => {
-  const result = await ProductModel.findOne({ _id });
+  const result = await Product.findOne({ _id });
   return result;
 };
 
-const updateProductFromDB = async (_id: string, updatedProduct: Product) => {
+const updateProductFromDB = async (_id: string, updatedProduct: TProduct) => {
   try {
-    const product = await ProductModel.findById({ _id }); // Find the product to update
+    const product = await Product.findById({ _id }); // Find the product to update
 
     if (!product) {
       throw new Error("Product not found"); // Handle product not found error
@@ -51,16 +49,21 @@ const updateProductFromDB = async (_id: string, updatedProduct: Product) => {
   }
 };
 
-const searchProductsByTitle = async (searchTerm: string) => {
+const getProducts = async (searchTerm?: string) => {
+  // Optional searchTerm parameter
+  if (!searchTerm) {
+    const allProducts = await Product.find(); // Get all products
+    return allProducts;
+  }
+
   const regex = new RegExp(searchTerm, "i"); // Case-insensitive search
-  const products = await ProductModel.find({ name: { $regex: regex } });
-  return products;
+  const searchedProducts = await Product.find({ name: { $regex: regex } }); // Search by title
+  return searchedProducts;
 };
 
 export const productServices = {
   createProductIntoDB,
-  getAllProductsFromDB,
-  searchProductsByTitle,
+  getProducts,
   getSingleProductFromDB,
   deleteProductFromDB,
   updateProductFromDB,
