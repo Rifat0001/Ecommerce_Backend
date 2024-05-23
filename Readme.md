@@ -7,13 +7,16 @@
 
 ```
 npm install
+
 ```
 
 <br>
 
 **Step - 3:** run `npm run start:dev` on cmd
+
 ```
 npm run start:dev
+
 ```
 <br>
 
