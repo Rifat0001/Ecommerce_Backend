@@ -1,19 +1,26 @@
 import { Request, Response } from 'express';
 import { productServices } from './product.service';
 import productValidateSchema from './product.validation';
+import { Product } from './product.model';
 
 // for create product
 const createProduct = async (req: Request, res: Response) => {
   try {
     const productData = req.body;
     const zodParseData = productValidateSchema.parse(productData);
-    const result = await productServices.createProductIntoDB(zodParseData);
+    if (await Product.isUserExists(productData.name)) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Product already exists' });
+    } else {
+      const result = await productServices.createProductIntoDB(zodParseData);
 
-    res.status(200).json({
-      success: true,
-      message: 'Product created successfully!',
-      data: result,
-    });
+      res.status(200).json({
+        success: true,
+        message: 'Product created successfully!',
+        data: result,
+      });
+    }
   } catch (err) {
     console.log(err);
   }

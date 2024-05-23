@@ -2,9 +2,6 @@ import { TProduct } from './product.interface';
 import { Product } from './product.model';
 
 const createProductIntoDB = async (productData: TProduct) => {
-  if (await Product.isUserExists(productData.name)) {
-    throw new Error('Product already Exist');
-  }
   const result = await Product.create(productData);
   return result;
 };
