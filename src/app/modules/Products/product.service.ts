@@ -1,9 +1,9 @@
-import { TProduct } from "./product.interface";
-import { Product } from "./product.model";
+import { TProduct } from './product.interface';
+import { Product } from './product.model';
 
 const createProductIntoDB = async (productData: TProduct) => {
   if (await Product.isUserExists(productData.name)) {
-    throw new Error("Product already Exist");
+    throw new Error('Product already Exist');
   }
   const result = await Product.create(productData);
   return result;
@@ -13,7 +13,7 @@ const deleteProductFromDB = async (_id: string) => {
   const product = await Product.findByIdAndDelete(_id); // Find and delete
 
   if (!product) {
-    throw new Error("Product not found");
+    throw new Error('Product not found');
   }
   return product;
 };
@@ -28,7 +28,7 @@ const updateProductFromDB = async (_id: string, updatedProduct: TProduct) => {
     const product = await Product.findById({ _id }); // Find the product to update
 
     if (!product) {
-      throw new Error("Product not found"); // Handle product not found error
+      throw new Error('Product not found'); // Handle product not found error
     }
 
     // Update product properties
@@ -56,7 +56,7 @@ const getProducts = async (searchTerm?: string) => {
     return allProducts;
   }
 
-  const regex = new RegExp(searchTerm, "i"); // Case-insensitive search
+  const regex = new RegExp(searchTerm, 'i'); // Case-insensitive search
   const searchedProducts = await Product.find({ name: { $regex: regex } }); // Search by title
   return searchedProducts;
 };

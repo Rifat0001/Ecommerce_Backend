@@ -1,7 +1,7 @@
-import { Product } from "../Products/product.model";
-import { TOrder } from "./order.interface";
-import { OrderModel } from "./order.model";
-import { ClientSession, startSession } from "mongoose";
+import { Product } from '../Products/product.model';
+import { TOrder } from './order.interface';
+import { OrderModel } from './order.model';
+import { ClientSession, startSession } from 'mongoose';
 
 const createOrder = async (orderData: TOrder) => {
   const session: ClientSession = await startSession();
@@ -9,17 +9,17 @@ const createOrder = async (orderData: TOrder) => {
 
   try {
     const product = await Product.findById(orderData.productId).session(
-      session
+      session,
     );
 
     if (!product) {
-      throw new Error("Product not found"); // Throw an error
+      throw new Error('Product not found'); // Throw an error
     }
 
     // console.log(product); // Now logs the product object
 
     if (product.inventory.quantity < orderData.quantity) {
-      throw new Error("Insufficient quantity available in inventory"); // Throw an error
+      throw new Error('Insufficient quantity available in inventory'); // Throw an error
     }
 
     // Order creation logic (only if there's sufficient quantity)
@@ -35,15 +35,15 @@ const createOrder = async (orderData: TOrder) => {
     return newOrder;
   } catch (err) {
     await session.abortTransaction();
-    console.error(err);
+    // console.error(err);
 
     // Use type guards to narrow the type of err
     if (err instanceof Error) {
       // Check if err is an Error object
       return { success: false, message: err.message }; // Access message property
     } else {
-      console.error("Unexpected error type:", err); // Handle unexpected error types
-      return { success: false, message: "Internal server error" };
+      // console.error('Unexpected error type:', err); // Handle unexpected error types
+      return { success: false, message: 'Internal server error' };
     }
   } finally {
     session.endSession();
@@ -54,7 +54,7 @@ const getOrders = async (searchTerm?: string) => {
   const query: any = {}; // Initialize an empty query object
 
   if (searchTerm) {
-    const regex = new RegExp(searchTerm, "i"); // Case-insensitive search
+    const regex = new RegExp(searchTerm, 'i'); // Case-insensitive search
     query.email = { $regex: regex }; // Search by email using regex
   }
 
