@@ -51,7 +51,9 @@ const searchOrders = async (req: Request, res: Response) => {
     const orders = await orderServices.getOrders(searchTerm);
 
     const message = searchTerm
-      ? `Orders fetched successfully for email containing '${searchTerm}'!`
+      ? orders.length > 0
+        ? `Orders fetched successfully for email containing '${searchTerm}'!`
+        : `No order found on this email ${searchTerm}`
       : 'Orders fetched successfully!';
 
     res.status(200).json({
