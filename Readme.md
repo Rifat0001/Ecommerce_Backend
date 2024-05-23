@@ -5,15 +5,14 @@
 
 **Step - 2:** open the code file and run this command `npm install` to install the node modules
 
-```
-npm install
-
+```npm install
 ```
 
 <br>
 
 **Step - 3:** run `npm run start:dev` on cmd
-
+```npm run start:dev
+```
 <br>
 
 **Step - 4:** test the routes
