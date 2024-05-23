@@ -1,8 +1,7 @@
 import { Product } from "../Products/product.model";
 import { TOrder } from "./order.interface";
 import { OrderModel } from "./order.model";
-import { startSession } from "mongoose";
-import { ClientSession } from "mongodb";
+import { ClientSession, startSession } from "mongoose";
 
 const createOrder = async (orderData: TOrder) => {
   const session: ClientSession = await startSession();
@@ -14,8 +13,10 @@ const createOrder = async (orderData: TOrder) => {
     );
 
     if (!product) {
-      throw new Error("Product not found");
+      return { success: false, message: "Product not found" };
     }
+
+    console.log(product); // Now logs the product object
 
     if (product.inventory.quantity < orderData.quantity) {
       return {
@@ -30,15 +31,14 @@ const createOrder = async (orderData: TOrder) => {
     product.inventory.quantity -= orderData.quantity;
     product.inventory.inStock = product.inventory.quantity === 0 ? false : true; // Update inStock
 
-    await product.save({ session }); 
-    return {
-      success: true,
-      message: "Order created successfully!",
-      data: newOrder,
-    };
+    await product.save({ session }); // Save product update within the transaction
+
+    await session.commitTransaction();
+    return newOrder;
   } catch (err) {
-    // No abortTransaction needed - handled by Mongoose automatically on errors
-    throw err; // Re-throw other errors for handling in the controller
+    await session.abortTransaction();
+    console.error(err);
+    return { success: false, message: "Internal server error" }; // Handle unexpected errors
   } finally {
     session.endSession();
   }
