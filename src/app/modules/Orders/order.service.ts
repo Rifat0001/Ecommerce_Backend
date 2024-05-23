@@ -13,18 +13,16 @@ const createOrder = async (orderData: TOrder) => {
     );
 
     if (!product) {
-      return { success: false, message: "Product not found" };
+      throw new Error("Product not found"); // Throw an error
     }
 
-    console.log(product); // Now logs the product object
+    // console.log(product); // Now logs the product object
 
     if (product.inventory.quantity < orderData.quantity) {
-      return {
-        success: false,
-        message: "Insufficient quantity available in inventory",
-      };
+      throw new Error("Insufficient quantity available in inventory"); // Throw an error
     }
 
+    // Order creation logic (only if there's sufficient quantity)
     const newOrder = new OrderModel(orderData);
     await newOrder.save({ session }); // Save order within the transaction
 
@@ -38,7 +36,15 @@ const createOrder = async (orderData: TOrder) => {
   } catch (err) {
     await session.abortTransaction();
     console.error(err);
-    return { success: false, message: "Internal server error" }; // Handle unexpected errors
+
+    // Use type guards to narrow the type of err
+    if (err instanceof Error) {
+      // Check if err is an Error object
+      return { success: false, message: err.message }; // Access message property
+    } else {
+      console.error("Unexpected error type:", err); // Handle unexpected error types
+      return { success: false, message: "Internal server error" };
+    }
   } finally {
     session.endSession();
   }
